@@ -1,0 +1,39 @@
+﻿<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="mb-4">Student Details</h2>
+            <a href="@Url.Action("Index", "Students")" class="btn btn-secondary">Back to Students List</a>
+
+            <div id="studentDetails" class="border p-4 rounded bg-light">
+                <p><strong>Name:</strong> <span id="studentName"></span></p>
+                <p><strong>Age:</strong> <span id="studentAge"></span></p>
+                <p><strong>Subjects:</strong> <span id="studentSubjects"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let studentId = '@ViewBag.StudentId';
+
+        $(document).ready(function () {
+            $.ajax({
+                url: `/api/StudentsApi/${studentId}`,
+                method: 'GET',
+                success: function (student) {
+                    let subjects = student.studentSubjects
+                        .filter(ss => ss && ss.subject)
+                        .map(ss => ss.subject.name)
+                        .join(', ');
+                    $("#studentName").text(student.name);
+                    $("#studentAge").text(student.age);
+                    $("#studentSubjects").text(subjects);
+                },
+                error: function () {
+                    $("#studentDetails").html("<p class='text-danger'>Failed to fetch student details. Please try again later.</p>");
+                }
+            });
+        });
+    </script>
+}

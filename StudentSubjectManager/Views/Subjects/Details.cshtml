@@ -1,0 +1,35 @@
+﻿@{
+    ViewBag.Title = "Subject Details";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="mb-4">Subject Details</h2>
+            <a href="@Url.Action("Index", "Subjects")" class="btn btn-secondary mb-3">Back to Subjects List</a>
+
+            <div id="subjectDetails" class="border p-4 rounded bg-light">
+                <!-- Populated by JavaScript -->
+            </div>
+
+            <div class="mt-3">
+                <a href="/Subjects/Edit/@ViewBag.SubjectId" class="btn btn-warning">Edit</a>
+                <a href="/Subjects/Delete/@ViewBag.SubjectId" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const subjectId = @ViewBag.SubjectId; // Assuming you passed the subject ID to this view using ViewBag
+
+    fetch(`/api/SubjectsApi/${subjectId}`)
+        .then(response => response.json())
+        .then(data => {
+            const detailsDiv = document.getElementById('subjectDetails');
+            detailsDiv.innerHTML = `
+                    <strong>Subject ID:</strong> ${data.id} <br>
+                    <strong>Subject Name:</strong> ${data.name}
+                `;
+        });
+</script>

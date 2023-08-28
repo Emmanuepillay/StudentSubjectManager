@@ -1,0 +1,76 @@
+﻿<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Create New Student</strong>
+                </div>
+                <div class="card-body">
+                    <form id="createStudentForm">
+                        <div class="form-group">
+                            <label for="name">Name:</label>
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Enter student's name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="age">Age:</label>
+                            <input type="number" class="form-control" id="age" name="age" placeholder="Enter student's age" required>
+                        </div>
+                        <!-- Subjects input can be added here -->
+                        <div class="form-group">
+                            <label for="subjects">Subjects:</label>
+                            <select multiple class="form-control" id="subjects"></select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <a href="@Url.Action("Index", "Students")" class="btn btn-secondary ml-2">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Fetch subjects and populate the dropdown
+            $.ajax({
+                url: '/api/SubjectsApi',
+                method: 'GET',
+                success: function (data) {
+                    data.forEach(function (subject) {
+                        $("#subjects").append(`<option value="${subject.id}">${subject.name}</option>`);
+                    });
+                }
+            });
+        });
+
+        $("#createStudentForm").submit(function (e) {
+            e.preventDefault();
+
+            let selectedSubjects = $("#subjects").val();
+
+            let studentData = {
+                name: $("#name").val(),
+                age: $("#age").val(),
+                studentSubjects: selectedSubjects.map(id => { return { subjectId: id }; })
+            };
+            $.ajax({
+                url: '/api/StudentsApi',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(studentData),
+                success: function () {
+                    // Navigate back to the students index or show a success message
+                    window.location.href = "/Students/Index";
+                },
+                error: function () {
+                    // Show an error message
+                    alert('Error adding student.');
+                }
+            });
+        });
+
+    </script>
+}

@@ -1,0 +1,47 @@
+﻿<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="mb-4">Delete Subject</h2>
+            <a href="@Url.Action("Index", "Subjects")" class="btn btn-secondary mb-4">Back to Subjects List</a>
+
+            <div id="subjectDetails" class="border p-4 rounded bg-light mb-4">
+                <!-- Populated by JavaScript -->
+            </div>
+
+            <form id="deleteSubjectForm">
+                <div class="alert alert-danger" role="alert">
+                    Are you sure you want to delete this subject?
+                </div>
+                <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                <a href="@Url.Action("Index", "Subjects")" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const subjectId = @ViewBag.SubjectId; // Assuming you passed the subject ID to this view using ViewBag
+
+        fetch(`/api/SubjectsApi/${subjectId}`)
+            .then(response => response.json())
+            .then(data => {
+                const detailsDiv = document.getElementById('subjectDetails');
+                detailsDiv.innerHTML = `
+                            <strong>Subject ID:</strong> ${data.id} <br>
+                            <strong>Subject Name:</strong> ${data.name}
+                        `;
+            });
+
+        document.getElementById('deleteSubjectForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            fetch(`/api/SubjectsApi/${subjectId}`, {
+                method: 'DELETE',
+            })
+                .then(() => {
+                    window.location.href = '/Subjects/Index'; // Redirect to list view after successful deletion
+                });
+        });
+    </script>
+}

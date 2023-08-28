@@ -1,0 +1,80 @@
+﻿@{
+    ViewBag.Title = "Edit Student";
+}
+
+<div class="container my-4">
+    <h2>Edit Student</h2>
+    <form id="editStudentForm">
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" required>
+        </div>
+        <div class="form-group">
+            <label for="age">Age:</label>
+            <input type="number" class="form-control" id="age" required>
+        </div>
+        <div class="form-group">
+            <label for="subjects">Subjects:</label>
+            <select multiple class="form-control" id="subjects"></select>
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        let studentId = '@ViewBag.StudentId';
+
+        // Fetch student data and populate the form fields
+        $.ajax({
+            url: `/api/StudentsApi/${studentId}`,
+            method: 'GET',
+            success: function (student) {
+                $("#name").val(student.name);
+                $("#age").val(student.age);
+                let associatedSubjectIds = student.studentSubjects.map(ss => ss.subjectId);
+
+                // Fetch all subjects
+                $.ajax({
+                    url: '/api/SubjectsApi',
+                    method: 'GET',
+                    success: function (subjects) {
+                        subjects.forEach(function (subject) {
+                            let isSelected = associatedSubjectIds.includes(subject.id);
+                            $("#subjects").append(
+                                `<option value="${subject.id}" ${isSelected ? 'selected' : ''}>${subject.name}</option>`
+                            );
+                        });
+                    }
+                });
+            }
+        });
+
+        // Form submission logic
+        $("#editStudentForm").submit(function (e) {
+            e.preventDefault();
+
+            let selectedSubjects = $("#subjects").val();
+
+            let studentData = {
+                id: studentId,
+                name: $("#name").val(),
+                age: $("#age").val(),
+                studentSubjects: selectedSubjects.map(id => { return { subjectId: parseInt(id) }; })
+            };
+
+            $.ajax({
+                url: `/api/StudentsApi/${studentId}`,
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(studentData),
+                success: function () {
+                    window.location.href = "/Students/Index";
+                },
+                error: function () {
+                    alert('Error updating student.');
+                }
+            });
+        });
+    </script>
+}

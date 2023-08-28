@@ -1,0 +1,38 @@
+﻿<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h2 class="mb-4">Create Subject</h2>
+            <a href="@Url.Action("Index", "Subjects")" class="btn btn-secondary mb-4">Back to Subjects List</a>
+
+            <form id="createSubjectForm">
+                <div class="form-group">
+                    <label for="name">Subject Name:</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('createSubjectForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+
+            fetch('/api/SubjectsApi', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: name })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    window.location.href = '/Subjects/Index'; // Redirect to list view after successful creation
+                });
+        });
+    </script>
+}
